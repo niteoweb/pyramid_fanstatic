@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from builtins import str
+
 from fanstatic.config import convert_config
 from fanstatic.publisher import Publisher
 import fanstatic
 import logging
 import os
+import sys
 import wsgiref.util
 from pyramid.settings import asbool
 
@@ -71,8 +74,13 @@ class Tween(object):
 
         if needed.has_resources():
             if self.injector is not None:
-                result = self.injector(response.body,
-                                       needed, request, response)
+                if sys.version_info[0] == 2:
+                    result = self.injector(str(response.body, 'utf-8'),
+                                           needed, request, response)
+                else:
+                    result = self.injector(response.body,
+                                           needed, request, response)
+
             else:
                 result = needed.render_topbottom_into_html(response.body)
             try:
